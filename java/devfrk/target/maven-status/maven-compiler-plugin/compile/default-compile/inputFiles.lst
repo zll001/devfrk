@@ -1,0 +1,10 @@
+/home/projects/java/devfrk/java/devfrk/src/main/java/cn/abcsys/faas/application/webfrk/core/HttpController.java
+/home/projects/java/devfrk/java/devfrk/src/main/java/cn/abcsys/faas/application/webfrk/core/HttpHandlerConfigure.java
+/home/projects/java/devfrk/java/devfrk/src/main/java/cn/abcsys/faas/application/webfrk/core/HttpHandlerException.java
+/home/projects/java/devfrk/java/devfrk/src/main/java/cn/abcsys/faas/application/webfrk/ApplicationServer.java
+/home/projects/java/devfrk/java/devfrk/src/main/java/cn/abcsys/faas/application/webfrk/core/HttpConstants.java
+/home/projects/java/devfrk/java/devfrk/src/main/java/cn/abcsys/faas/application/webfrk/utils/ObjectUtils.java
+/home/projects/java/devfrk/java/devfrk/src/main/java/cn/abcsys/faas/application/webfrk/utils/JSONUtils.java
+/home/projects/java/devfrk/java/devfrk/src/main/java/cn/abcsys/faas/application/webfrk/core/annotation/BeanDefinition.java
+/home/projects/java/devfrk/java/devfrk/src/main/java/cn/abcsys/faas/application/webfrk/core/spi/HttpBodyHandler.java
+/home/projects/java/devfrk/java/devfrk/src/main/java/cn/abcsys/faas/application/webfrk/core/HttpResponse.java
