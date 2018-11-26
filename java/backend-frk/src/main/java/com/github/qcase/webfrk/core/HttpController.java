@@ -7,11 +7,17 @@ package com.github.qcase.webfrk.core;
 import java.lang.reflect.Method;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Null;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.lang.Nullable;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -26,6 +32,10 @@ import com.github.qcase.webfrk.utils.JSONUtils;
 /**
  * @author wuheng(@iscas.ac.cn)
  * @since   2018/11/24
+ * 
+ * The {@code HttpController} class is used to dispatch request 
+ * to the related handler, if the handler is not found, it would 
+ * throw an exception. 
  */
 @RestController
 @ComponentScan
@@ -36,27 +46,62 @@ public class HttpController {
 	 */
 	public final static Logger m_logger = Logger.getLogger(HttpController.class);
 	
+	/**
+	 * handler means how to deal with the request for 
+	 * specified servletPath 
+	 */
 	@Autowired
-	protected HttpHandlerConfigure configure;
+	protected HttpHandlerManager handlers;
 	
-	@RequestMapping("/*")
+	@GetMapping("/*")
 	@ResponseBody
-	public String handleVaildHttpRequest(
+	public String handleVaildGetRequest(
+							HttpServletRequest request,
+							JSONObject body) throws Exception{
+		return handleVaildHttpRequest(request, null);
+	}
+	
+	@PostMapping("/*")
+	@ResponseBody
+	public String handleVaildPostRequest(
 							HttpServletRequest request, 
 							@RequestBody JSONObject body) throws Exception{
-		String servletPath = getOperator(request, body);
-		m_logger.info("Begin to deal with " + request.getServletPath());
-		
-		Method targetMethod = getTargetMethod(servletPath);
-		
-		Object returnObject = targetMethod.invoke(
-						getInstance(servletPath), 
-						getParams(body, targetMethod));
-		
-		m_logger.info("Successfully deal with " + request.getServletPath());
-		return JSON.toJSONString(returnObject);
+		return handleVaildHttpRequest(request, body);
+	}
+	
+	@PutMapping("/*")
+	@ResponseBody
+	public String handleVaildPutRequest(
+							HttpServletRequest request, 
+							@RequestBody JSONObject body) throws Exception{
+		return handleVaildHttpRequest(request, body);
 	}
 
+	@DeleteMapping("/*")
+	@ResponseBody
+	public String handleVaildDeleteRequest(
+							HttpServletRequest request, 
+							@RequestBody JSONObject body) throws Exception{
+		return handleVaildHttpRequest(request, body);
+	}
+	
+	protected String handleVaildHttpRequest(
+			HttpServletRequest request, 
+			JSONObject body) throws Exception{
+		String servletPath = request.getServletPath().substring(1);
+//		m_logger.info("Begin to deal with " + request.getServletPath());
+//		
+//		Method targetMethod = getTargetMethod(servletPath);
+//		
+//		Object returnObject = targetMethod.invoke(
+//						getInstance(servletPath), 
+//						getParams(body, targetMethod));
+//		
+//		m_logger.info("Successfully deal with " + request.getServletPath());
+//		return JSON.toJSONString(returnObject);
+		return "Hello";
+	}
+	
 	@RequestMapping("/*/**")
 	@ResponseBody
 	public String handleInvalidHttpRequestURL(HttpServletRequest request) {
@@ -82,14 +127,10 @@ public class HttpController {
 	 * 
 	 * 
 	 **************************************************/
-	protected String getOperator(HttpServletRequest request, 
-							JSONObject body) {
-		return request.getServletPath().substring(1);
-	}
 
 	protected HttpBodyHandler getInstance(String servletPath)
 			throws InstantiationException, IllegalAccessException, Exception {
-		return (HttpBodyHandler) configure.geHandler(servletPath).newInstance();
+		return (HttpBodyHandler) handlers.geHandler(servletPath).newInstance();
 	}
 	
 	protected Object[] getParams(JSONObject body, Method targetMethod) {
@@ -104,7 +145,7 @@ public class HttpController {
 	}
 
 	protected Method getTargetMethod(String servletPath) throws Exception {
-		for (Method method : configure.geHandler(servletPath).getMethods()) {
+		for (Method method : handlers.geHandler(servletPath).getMethods()) {
 			if (method.isAnnotationPresent(BeanDefinition.class)) {
 				return method;
 			}

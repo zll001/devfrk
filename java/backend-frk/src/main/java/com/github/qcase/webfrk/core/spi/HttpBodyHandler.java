@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 
 import com.github.qcase.webfrk.core.HttpController;
-import com.github.qcase.webfrk.core.HttpHandlerConfigure;
+import com.github.qcase.webfrk.core.HttpHandlerManager;
 
 /**
  * @author wuheng(@iscas.ac.cn)
@@ -29,7 +29,7 @@ public abstract class HttpBodyHandler implements CommandLineRunner {
 	 **********************************************************/
 	
 	@Autowired
-	protected HttpHandlerConfigure configure;
+	protected HttpHandlerManager configure;
 	
 	@Override
 	public void run(String... args) throws Exception {

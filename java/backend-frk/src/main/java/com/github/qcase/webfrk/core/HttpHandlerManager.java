@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * @since   2018/11/24
  */
 @Component
-public class HttpHandlerConfigure  {
+public class HttpHandlerManager  {
 
 	protected Properties handlers = new Properties();
 
