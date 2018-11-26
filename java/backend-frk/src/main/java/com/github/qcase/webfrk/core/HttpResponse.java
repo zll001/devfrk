@@ -14,12 +14,20 @@ package com.github.qcase.webfrk.core;
 public class HttpResponse {
 
 	/**
-	 * 
+	 * neither 200 or 500
 	 */
 	protected int status;
 	
+	/**
+	 * it represents the exception information,
+	 * otherwise it should be null
+	 */
 	protected String message;
 	
+	/**
+	 * if it is not an exception, the response
+	 * is the object.
+	 */
 	protected Object result;
 	
 	public HttpResponse() {

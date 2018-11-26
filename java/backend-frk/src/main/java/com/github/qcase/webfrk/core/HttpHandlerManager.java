@@ -3,7 +3,9 @@
  */
 package com.github.qcase.webfrk.core;
 
-import java.util.Properties;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -14,15 +16,34 @@ import org.springframework.stereotype.Component;
 @Component
 public class HttpHandlerManager  {
 
-	protected Properties handlers = new Properties();
+	protected Map<String, HandlerDesc> handlers = new HashMap<String, HandlerDesc>();
 
-	public void addHandler(String kind, Class<?> clazz) {
-		handlers.put(kind, clazz);
+	public void addHandler(String kind, HandlerDesc hp) {
+		handlers.put(kind, hp);
 	}
 
-	public Class<?> geHandler(String kind) throws Exception {
-		return (Class<?>) handlers.get(kind);
+	public HandlerDesc geHandler(String kind) throws Exception {
+		return handlers.get(kind);
 	}
 
+	public static class HandlerDesc {
+		
+		protected final Method method;
+		
+		protected final Class<?> clazz;
 
+		public HandlerDesc(Method method, Class<?> clazz) {
+			super();
+			this.method = method;
+			this.clazz = clazz;
+		}
+
+		public Method getMethod() {
+			return method;
+		}
+
+		public Class<?> getClazz() {
+			return clazz;
+		}
+	}
 }

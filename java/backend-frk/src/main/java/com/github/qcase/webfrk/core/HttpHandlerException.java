@@ -5,7 +5,7 @@ package com.github.qcase.webfrk.core;
 
 /**
  * @author wuheng@otcaix.iscas.ac.cn
- * @since  2018年4月28日
+ * @since  2018/11/26
  * 
  * <p>
  * The {@code HttpResponse} class represents the return

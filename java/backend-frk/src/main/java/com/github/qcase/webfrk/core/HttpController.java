@@ -5,7 +5,6 @@ package com.github.qcase.webfrk.core;
 
 
 import java.lang.reflect.Method;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,12 +15,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.github.qcase.webfrk.core.annotation.BeanDefinition;
+import com.github.qcase.webfrk.core.spi.BeanDefinition;
 import com.github.qcase.webfrk.core.spi.HttpBodyHandler;
 import com.github.qcase.webfrk.utils.JSONUtils;
 
@@ -60,7 +59,7 @@ public class HttpController {
 		if (request.getParameterMap().size() != 0) {
 			throw new Exception("Unsupport parameters for 'Get' request");
 		}
- 		return handleHttpRequest(request, null);
+ 		return handleHttpRequest(request.getServletPath().substring(1), body);
 	}
 	
 	/**
@@ -69,33 +68,50 @@ public class HttpController {
 	 * @return            the {@code HttpBodyHandler} result. In fact, it may be an exception.
 	 * @throws Exception  it can be any exception that {@code HttpBodyHandler} throws
 	 */
-	@RequestMapping(method = {RequestMethod.POST, RequestMethod.DELETE, 
-												RequestMethod.PUT}, value = {"/*"})
-	public @ResponseBody String dispatchVaildPostOrPutOrDeleteRequest(
+	@RequestMapping(method = {RequestMethod.POST, RequestMethod.PUT}, value = {"/*"})
+	public @ResponseBody String dispatchVaildPostOrPutRequest(
 				HttpServletRequest request, @RequestBody JSONObject body) throws Exception{
 		// in fact, it can be checked by regular expression at @RequestMapping,
 		// and we would improve it later
 		String spath = request.getServletPath().substring(1);
 		if (spath.startsWith("get") || spath.startsWith("list") 
-										|| spath.startsWith("query")) {
-			throw new Exception("Invalid servlet path was requested");
+										|| spath.startsWith("query") 
+										|| spath.startsWith("delete")
+										|| spath.startsWith("remove")) {
+			throw new Exception(HttpConstants.EXCEPTION_INVALID_REQUEST_URL);
 		}
-		return handleHttpRequest(request, body);
+		return handleHttpRequest(spath, body);
 	}
 	
-	protected String handleHttpRequest( HttpServletRequest request, 
-												JSONObject body) throws Exception{
-//		m_logger.info("Begin to deal with " + request.getServletPath());
-//		
-//		Method targetMethod = getTargetMethod(servletPath);
-//		
-//		Object returnObject = targetMethod.invoke(
-//						getInstance(servletPath), 
-//						getParams(body, targetMethod));
-//		
-//		m_logger.info("Successfully deal with " + request.getServletPath());
-//		return JSON.toJSONString(returnObject);
-		return "Hello";
+	/**
+	 * @param request    servlet path should be startwith 'delete', or 'remove'
+	 * @return           the {@code HttpBodyHandler} result. In fact, it may be an exception.
+	 * @throws Exception it can be any exception that {@code HttpBodyHandler} throws
+	 */
+	@RequestMapping(method = RequestMethod.DELETE, value = {"/delete*", "/remove*"})
+	public @ResponseBody String dispatchVaildDeleteRequest(HttpServletRequest request, 
+												@RequestBody  JSONObject body) throws Exception{
+ 		return handleHttpRequest(request.getServletPath().substring(1), body);
+	}
+	
+	/**
+	 * @param servletPath
+	 * @param body
+	 * @return
+	 * @throws Exception
+	 */
+	protected String handleHttpRequest(String servletPath, 
+								JSONObject body) throws Exception{
+		
+		m_logger.info("Begin to deal with " + servletPath);
+		
+		Method target = handlers.geHandler(servletPath).getMethod();
+		Object returnObject = target.invoke(
+						getInstance(servletPath), 
+						getParams(body, target));
+		
+		m_logger.info("Successfully deal with " + servletPath);
+		return JSON.toJSONString(returnObject);
 	}
 	
 	@RequestMapping("/*/**")
@@ -124,14 +140,18 @@ public class HttpController {
 	 * 
 	 **************************************************/
 
-	protected HttpBodyHandler getInstance(String servletPath)
-			throws InstantiationException, IllegalAccessException, Exception {
-		return (HttpBodyHandler) handlers.geHandler(servletPath).newInstance();
+	protected HttpBodyHandler getInstance(String servletPath) throws Exception {
+		return (HttpBodyHandler) handlers.geHandler(
+							servletPath).getClazz().newInstance();
 	}
 	
 	protected Object[] getParams(JSONObject body, Method targetMethod) {
 		Class<?>[] pTypes = targetMethod.getParameterTypes();
 		String[] pNames = targetMethod.getAnnotation(BeanDefinition.class).names();
+		
+		if (pTypes.length == 1 && pNames.length == 0) {
+			return new Object[] {body.toJavaObject(pTypes[0])};
+		}
 		
 		Object[] pObjects = (pTypes.length != 0) ? new Object[pTypes.length] : null;		
 		for (int i = 0; i < pTypes.length; i++) {
@@ -140,12 +160,4 @@ public class HttpController {
 		return pObjects;
 	}
 
-	protected Method getTargetMethod(String servletPath) throws Exception {
-		for (Method method : handlers.geHandler(servletPath).getMethods()) {
-			if (method.isAnnotationPresent(BeanDefinition.class)) {
-				return method;
-			}
-		}
-		throw new HttpHandlerException(HttpConstants.EXCEPTION_MISSING_BEANDEFINITION_ANOTATION);
-	}
 }

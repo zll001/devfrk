@@ -1,7 +1,7 @@
 /**
  * Copyrigt (2018, ) Institute of Software, Chinese Academy of Sciences
  */
-package com.github.qcase.webfrk.core.annotation;
+package com.github.qcase.webfrk.core.spi;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

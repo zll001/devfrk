@@ -5,26 +5,11 @@ package com.github.qcase.webfrk.core;
 
 /**
  * @author wuheng@otcaix.iscas.ac.cn
- * @since 2018年4月28日
+ * @since 2018/11/27
  * 
  */
 public class HttpConstants {
 
-	/*****************************************************************
-	 * 
-	 *                       HTTP Request
-	 * 
-	 *****************************************************************/
-	public final static String HTTP_REQUEST_PATH_INFO = "pathInfo";
-
-	public final static String HTTP_REQUEST_USER_INFO = "userInfo";
-
-	public final static String HTTP_REQUEST_PROXY_INFO = "proxyInfo";
-
-	public final static String HTTP_REQUEST_PARAM_INFO = "paramInfo";
-	
-	public final static String HTTP_REQUEST_CONSTRAINTS = "constaints";
-	
 	/*****************************************************************
 	 * 
 	 *                       HTTP Response
