@@ -5,26 +5,21 @@ package com.github.qcase.webfrk.core;
 
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.Null;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.qcase.webfrk.core.annotation.BeanDefinition;
 import com.github.qcase.webfrk.core.spi.HttpBodyHandler;
@@ -54,23 +49,42 @@ public class HttpController {
 	@Autowired
 	protected HttpHandlerManager handlers;
 	
+	/**
+	 * @param request    servlet path should be startwith 'get', 'list', or 'query'
+	 * @return           the {@code HttpBodyHandler} result. In fact, it may be an exception.
+	 * @throws Exception it can be any exception that {@code HttpBodyHandler} throws
+	 */
 	@RequestMapping(method = RequestMethod.GET, value = {"/get*", "/list*", "/query*"})
-	public @ResponseBody String dispatchVaildGetRequest(
-								HttpServletRequest request) throws Exception{
-		return handleVaildHttpRequest(request, null);
+	public @ResponseBody String dispatchVaildGetRequest(HttpServletRequest request, 
+						@RequestBody(required = false)  JSONObject body) throws Exception{
+		if (request.getParameterMap().size() != 0) {
+			throw new Exception("Unsupport parameters for 'Get' request");
+		}
+ 		return handleHttpRequest(request, null);
 	}
 	
+	/**
+	 * @param request     servlet path cannot be startwith 'get', 'list', or 'query'
+	 * @param body        the body must be json format
+	 * @return            the {@code HttpBodyHandler} result. In fact, it may be an exception.
+	 * @throws Exception  it can be any exception that {@code HttpBodyHandler} throws
+	 */
 	@RequestMapping(method = {RequestMethod.POST, RequestMethod.DELETE, 
 												RequestMethod.PUT}, value = {"/*"})
 	public @ResponseBody String dispatchVaildPostOrPutOrDeleteRequest(
 				HttpServletRequest request, @RequestBody JSONObject body) throws Exception{
-		return handleVaildHttpRequest(request, body);
+		// in fact, it can be checked by regular expression at @RequestMapping,
+		// and we would improve it later
+		String spath = request.getServletPath().substring(1);
+		if (spath.startsWith("get") || spath.startsWith("list") 
+										|| spath.startsWith("query")) {
+			throw new Exception("Invalid servlet path was requested");
+		}
+		return handleHttpRequest(request, body);
 	}
 	
-	protected String handleVaildHttpRequest(
-			HttpServletRequest request, 
-			JSONObject body) throws Exception{
-		String servletPath = request.getServletPath().substring(1);
+	protected String handleHttpRequest( HttpServletRequest request, 
+												JSONObject body) throws Exception{
 //		m_logger.info("Begin to deal with " + request.getServletPath());
 //		
 //		Method targetMethod = getTargetMethod(servletPath);
