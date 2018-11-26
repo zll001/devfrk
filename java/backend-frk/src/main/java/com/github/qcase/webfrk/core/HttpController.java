@@ -46,7 +46,7 @@ public class HttpController {
 	 * specified servletPath 
 	 */
 	@Autowired
-	protected HttpHandlerManager handlers;
+	protected HandlerManager handlers;
 	
 	/**
 	 * @param request    servlet path should be startwith 'get', 'list', or 'query'
@@ -105,13 +105,17 @@ public class HttpController {
 		
 		m_logger.info("Begin to deal with " + servletPath);
 		
-		Method target = handlers.geHandler(servletPath).getMethod();
-		Object returnObject = target.invoke(
+		try {
+			Method target = handlers.geHandler(servletPath).getMethod();
+			Object returnObject = target.invoke(
 						getInstance(servletPath), 
 						getParams(body, target));
+			m_logger.info("Successfully deal with " + servletPath);
+			return JSON.toJSONString(returnObject);
+		} catch (Exception ex) {
+			throw new Exception(HttpConstants.EXCEPTION_INVALID_BEANDEFINITION_ANOTATION);
+		}
 		
-		m_logger.info("Successfully deal with " + servletPath);
-		return JSON.toJSONString(returnObject);
 	}
 	
 	@RequestMapping("/*/**")

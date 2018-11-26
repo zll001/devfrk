@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * @since   2018/11/24
  */
 @Component
-public class HttpHandlerManager  {
+public class HandlerManager  {
 
 	protected Map<String, HandlerDesc> handlers = new HashMap<String, HandlerDesc>();
 

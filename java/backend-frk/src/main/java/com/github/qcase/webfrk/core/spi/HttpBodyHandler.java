@@ -3,16 +3,16 @@
  */
 package com.github.qcase.webfrk.core.spi;
 
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 
 import com.github.qcase.webfrk.core.HttpController;
-import com.github.qcase.webfrk.core.HttpHandlerManager;
-import com.github.qcase.webfrk.core.HttpHandlerManager.HandlerDesc;
+import com.github.qcase.webfrk.core.HandlerManager;
+import com.github.qcase.webfrk.core.HandlerManager.HandlerDesc;
 
 /**
  * @author wuheng(@iscas.ac.cn)
@@ -28,7 +28,8 @@ public abstract class HttpBodyHandler implements CommandLineRunner {
 	/**
 	 * All handers
 	 */
-	protected HttpHandlerManager configure;
+	@Autowired
+	protected HandlerManager configure;
 	
 	/**
 	 * 
