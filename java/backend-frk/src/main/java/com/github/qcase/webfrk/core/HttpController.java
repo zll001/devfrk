@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -53,35 +54,16 @@ public class HttpController {
 	@Autowired
 	protected HttpHandlerManager handlers;
 	
-	@GetMapping("/*")
-	@ResponseBody
-	public String handleVaildGetRequest(
-							HttpServletRequest request,
-							JSONObject body) throws Exception{
+	@RequestMapping(method = RequestMethod.GET, value = {"/get*", "/list*", "/query*"})
+	public @ResponseBody String dispatchVaildGetRequest(
+								HttpServletRequest request) throws Exception{
 		return handleVaildHttpRequest(request, null);
 	}
 	
-	@PostMapping("/*")
-	@ResponseBody
-	public String handleVaildPostRequest(
-							HttpServletRequest request, 
-							@RequestBody JSONObject body) throws Exception{
-		return handleVaildHttpRequest(request, body);
-	}
-	
-	@PutMapping("/*")
-	@ResponseBody
-	public String handleVaildPutRequest(
-							HttpServletRequest request, 
-							@RequestBody JSONObject body) throws Exception{
-		return handleVaildHttpRequest(request, body);
-	}
-
-	@DeleteMapping("/*")
-	@ResponseBody
-	public String handleVaildDeleteRequest(
-							HttpServletRequest request, 
-							@RequestBody JSONObject body) throws Exception{
+	@RequestMapping(method = {RequestMethod.POST, RequestMethod.DELETE, 
+												RequestMethod.PUT}, value = {"/*"})
+	public @ResponseBody String dispatchVaildPostOrPutOrDeleteRequest(
+				HttpServletRequest request, @RequestBody JSONObject body) throws Exception{
 		return handleVaildHttpRequest(request, body);
 	}
 	
