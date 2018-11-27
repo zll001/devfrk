@@ -7,6 +7,7 @@ import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -142,6 +143,22 @@ public class SpecTest {
 					}
 				}
 			} 
+			
+			for (Parameter param : method.getParameters()) {
+				for (Annotation a : param.getAnnotations()) {
+					if (!a.annotationType().getName().startsWith("javax.validation.constraints")) {
+						Set<String> set = errors.get(name);
+						if (set == null) {
+							set = new HashSet<String>();
+							errors.put(name, set);
+						}
+						
+						if (!set.contains(a.getClass().getName())) {
+							set.add(a.annotationType().getName());
+						}
+					}
+				} 
+			}
 		}
 	}
 

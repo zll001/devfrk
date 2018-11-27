@@ -157,6 +157,7 @@ public class HttpController {
 	}
 	
 	protected Object[] getParams(JSONObject body, Method targetMethod) {
+		
 		Class<?>[] pTypes = targetMethod.getParameterTypes();
 		String[] pNames = targetMethod.getAnnotation(BeanDefinition.class).names();
 		
