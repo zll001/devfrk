@@ -7,13 +7,11 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.stereotype.Component;
 
 /**
  * @author wuheng(@iscas.ac.cn)
  * @since   2018/11/24
  */
-@Component
 public class HandlerManager  {
 
 	protected Map<String, HandlerDesc> handlers = new HashMap<String, HandlerDesc>();

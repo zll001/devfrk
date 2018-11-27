@@ -1,5 +1,5 @@
 /**
- * Copyright (2018, ) Hebei Turing CO., LTD.
+ * Copyright (2018, ) Institute of Software, Chinese Academy of Sciences
  */
 package com.github.qcase.webfrk;
 
@@ -22,8 +22,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.github.qcase.webfrk.core.HttpConstants;
 
 /**
- * @author wuheng(@otcaix.iscas.ac.cn)
- * @date 2018年4月11日
+ * @author wuheng(@iscas.ac.cn)
+ * @date 2018/11/27
  * @desc
  */
 @RunWith(SpringRunner.class)
