@@ -24,7 +24,7 @@ public class MockService extends HttpBodyHandler {
 	
 	@BeanDefinition
 	public String listMock() {
-		return "This is Mock";
+		return "Mock";
 	}
 	
 	@BeanDefinition(names= {"A", "B"})

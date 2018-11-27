@@ -29,30 +29,29 @@ import com.github.qcase.webfrk.core.HttpConstants;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = com.github.qcase.webfrk.core.HttpController.class)
 @AutoConfigureMockMvc
-public class RequestControllerTest  {
+public class MockTest  {
 
-	public final static String ROOT_PATH = "/";
+	public final static String VALID_GET_REQUEST_PATH   = "/mock/listMock";
 	
-	public final static String VALID_PATH = "/createExample";
-	
-	public final static String INVALID_PATH = "/abc/abc";
+	public final static String INVALID_GET_REQUEST_PATH = "/listMock";
 	
 	@Autowired
 	private MockMvc mvc;
 
 	@Test
-	public void testNullRequestBody() throws Exception {
-		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(
-							ROOT_PATH).accept(MediaType.APPLICATION_JSON);
+	public void testValidGetRequestBody() throws Exception {
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(
+							VALID_GET_REQUEST_PATH).accept(MediaType.APPLICATION_JSON_UTF8);
 		mvc.perform(builder)
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("status").value(HttpConstants.HTTP_RESPONSE_STATUS_FAILED));
+				.andExpect(jsonPath("status").value(HttpConstants.HTTP_RESPONSE_STATUS_OK))
+				.andExpect(jsonPath("result").value("Mock"));
 	}
 	
 	@Test
-	public void testInvalidRequestBody() throws Exception {
-		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(
-							INVALID_PATH).accept(MediaType.APPLICATION_JSON);
+	public void testInvalidGetRequestBody() throws Exception {
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(
+							INVALID_GET_REQUEST_PATH).accept(MediaType.APPLICATION_JSON_UTF8);
 		mvc.perform(builder)
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("status").value(HttpConstants.HTTP_RESPONSE_STATUS_FAILED))

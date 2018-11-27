@@ -59,7 +59,7 @@ public class HttpController {
 		if (request.getParameterMap().size() != 0) {
 			throw new Exception("Unsupport parameters for 'Get' request");
 		}
- 		return handleHttpRequest(request.getServletPath().substring(1), body);
+ 		return handleHttpRequest(getServletPath(request), body);
 	}
 	
 	/**
@@ -73,7 +73,7 @@ public class HttpController {
 				HttpServletRequest request, @RequestBody JSONObject body) throws Exception{
 		// in fact, it can be checked by regular expression at @RequestMapping,
 		// and we would improve it later
-		String spath = request.getServletPath().substring(1);
+		String spath = getServletPath(request);
 		if (spath.startsWith("get") || spath.startsWith("list") 
 										|| spath.startsWith("query") 
 										|| spath.startsWith("delete")
@@ -91,7 +91,7 @@ public class HttpController {
 	@RequestMapping(method = RequestMethod.DELETE, value = {"/**/delete*", "/**/remove*"})
 	public @ResponseBody String dispatchVaildDeleteRequest(HttpServletRequest request, 
 												@RequestBody  JSONObject body) throws Exception{
- 		return handleHttpRequest(request.getServletPath().substring(1), body);
+ 		return handleHttpRequest(getServletPath(request), body);
 	}
 	
 	/**
@@ -111,7 +111,9 @@ public class HttpController {
 						getInstance(servletPath), 
 						getParams(body, target));
 			m_logger.info("Successfully deal with " + servletPath);
-			return JSON.toJSONString(returnObject);
+			HttpResponse resp = new HttpResponse(HttpConstants
+					.HTTP_RESPONSE_STATUS_OK, returnObject);
+			return JSON.toJSONString(resp);
 		} catch (Exception ex) {
 			throw new Exception(HttpConstants.EXCEPTION_INVALID_BEANDEFINITION_ANOTATION);
 		}
@@ -144,6 +146,11 @@ public class HttpController {
 	 * 
 	 **************************************************/
 
+	protected String getServletPath(HttpServletRequest request) {
+		return request.getRequestURI().substring(
+				request.getContextPath().length() + 1);
+	}
+	
 	protected HttpBodyHandler getInstance(String servletPath) throws Exception {
 		return (HttpBodyHandler) handlers.geHandler(
 							servletPath).getClazz().newInstance();
