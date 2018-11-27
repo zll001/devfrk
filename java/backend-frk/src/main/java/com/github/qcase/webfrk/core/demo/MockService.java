@@ -32,4 +32,9 @@ public class MockService extends HttpBodyHandler {
 		return name + map.toString();
 	} 
 	
+	@BeanDefinition
+	public void listMock2() {
+		return;
+	}
+	
 }

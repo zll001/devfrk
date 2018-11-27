@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.qcase.webfrk.core.HandlerManager;
 import com.github.qcase.webfrk.core.HttpController;
 import com.github.qcase.webfrk.core.spi.BeanDefinition;
 import com.github.qcase.webfrk.core.spi.ServiceDefinition;
@@ -48,6 +49,7 @@ public class SpecTest {
 		ignoreClass.add(HttpController.class.getName());
 		ignoreClass.add(BeanDefinition.class.getName());
 		ignoreClass.add(ServiceDefinition.class.getName());
+		ignoreClass.add(HandlerManager.class.getName());
 	}
 	
 	public final static Set<String> blacklist = new HashSet<String>();
