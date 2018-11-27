@@ -4,7 +4,7 @@
 package com.github.qcase.webfrk.core;
 
 /**
- * @author wuheng@otcaix.iscas.ac.cn
+ * @author wuheng@(iscas.ac.cn)
  * @since 2018/11/27
  * 
  */
@@ -28,4 +28,6 @@ public class HttpConstants {
 	public final static String EXCEPTION_INVALID_REQUEST_URL = "Invalid servlet path was requested";
 	
 	public final static String EXCEPTION_INVALID_BEANDEFINITION_ANOTATION = "Invalid BeanDefinition was requested";
+	
+	public final static String EXCEPTION_INVALID_SERVICE_ANOTATION = "Invalid ServiceDefinition was requested";
 }

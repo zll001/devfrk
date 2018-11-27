@@ -53,7 +53,7 @@ public class HttpController {
 	 * @return           the {@code HttpBodyHandler} result. In fact, it may be an exception.
 	 * @throws Exception it can be any exception that {@code HttpBodyHandler} throws
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = {"/get*", "/list*", "/query*"})
+	@RequestMapping(method = RequestMethod.GET, value = {"/**/get*", "/**/list*", "/**/query*"})
 	public @ResponseBody String dispatchVaildGetRequest(HttpServletRequest request, 
 						@RequestBody(required = false)  JSONObject body) throws Exception{
 		if (request.getParameterMap().size() != 0) {
@@ -68,7 +68,7 @@ public class HttpController {
 	 * @return            the {@code HttpBodyHandler} result. In fact, it may be an exception.
 	 * @throws Exception  it can be any exception that {@code HttpBodyHandler} throws
 	 */
-	@RequestMapping(method = {RequestMethod.POST, RequestMethod.PUT}, value = {"/*"})
+	@RequestMapping(method = {RequestMethod.POST, RequestMethod.PUT}, value = {"/**/*"})
 	public @ResponseBody String dispatchVaildPostOrPutRequest(
 				HttpServletRequest request, @RequestBody JSONObject body) throws Exception{
 		// in fact, it can be checked by regular expression at @RequestMapping,
@@ -88,7 +88,7 @@ public class HttpController {
 	 * @return           the {@code HttpBodyHandler} result. In fact, it may be an exception.
 	 * @throws Exception it can be any exception that {@code HttpBodyHandler} throws
 	 */
-	@RequestMapping(method = RequestMethod.DELETE, value = {"/delete*", "/remove*"})
+	@RequestMapping(method = RequestMethod.DELETE, value = {"/**/delete*", "/**/remove*"})
 	public @ResponseBody String dispatchVaildDeleteRequest(HttpServletRequest request, 
 												@RequestBody  JSONObject body) throws Exception{
  		return handleHttpRequest(request.getServletPath().substring(1), body);
@@ -118,7 +118,7 @@ public class HttpController {
 		
 	}
 	
-	@RequestMapping("/*/**")
+	@RequestMapping(value = {"/*", "/*/*/**"})
 	@ResponseBody
 	public String handleInvalidHttpRequestURL(HttpServletRequest request) {
 		m_logger.error("Fail to deal with " + request.getServletPath() 

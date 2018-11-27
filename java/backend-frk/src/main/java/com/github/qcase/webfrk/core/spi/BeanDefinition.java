@@ -9,8 +9,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author wuheng@otcaix.iscas.ac.cn
- * @since  2018年5月3日
+ * @author wuheng@(iscas.ac.cn)
+ * @since  2018/11/27
  * 
  */
 @Target(ElementType.METHOD)

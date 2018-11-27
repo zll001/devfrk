@@ -5,18 +5,17 @@ package com.github.qcase.webfrk.core.demo;
 
 import java.util.Map;
 
-import org.springframework.stereotype.Component;
-
 import com.github.qcase.webfrk.core.spi.BeanDefinition;
 import com.github.qcase.webfrk.core.spi.HttpBodyHandler;
+import com.github.qcase.webfrk.core.spi.ServiceDefinition;
 
 /**
  * @author wuheng(@iscas.ac.cn)
  * @since   2018/11/24
  *
  */
-@Component
-public class HttpMock extends HttpBodyHandler {
+@ServiceDefinition
+public class MockService extends HttpBodyHandler {
 
 	@BeanDefinition
 	public String createMock(Map<String, String> map) {

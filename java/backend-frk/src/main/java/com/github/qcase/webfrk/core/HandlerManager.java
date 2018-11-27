@@ -10,7 +10,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
- * @author wuheng(@otcaix.iscas.ac.cn)
+ * @author wuheng(@iscas.ac.cn)
  * @since   2018/11/24
  */
 @Component
