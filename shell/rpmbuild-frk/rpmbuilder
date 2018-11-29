@@ -1,0 +1,71 @@
+####################################################
+##
+## Copyright (2017, ) Institute of Software, CAS
+##
+## Author: wuheng@{iscas.ac.cn}
+## Date  : 2018/11/29
+##
+#####################################################
+
+function parse()
+{
+  name=$(cat $1 | grep -w "NAME" | grep -v "#NAME" | awk '{print$2}')
+  version=$(cat $1 | grep -w "VERSION" | grep -v "#VERSION" | awk '{print$2}')
+
+  if [[ -z $name || -z $version ]]
+  then
+    echo "Missing Name or Version"
+    exit
+  fi
+ 
+  if [[ ! -d $name-$version ]]
+  then
+    echo "Missing diectory "$name-$version, "or you have wrong name with version"
+    exit
+  fi
+
+  rm -rf $name.spec
+  cp /root/build.spec $name.spec   
+
+  sed -i s/'_NAME_'/$name/g `grep '_NAME_' -rl $name.spec`  
+  sed -i s/'_VERSION_'/$version/g `grep '_VERSION_' -rl $name.spec`  
+ 
+  while read line
+  do
+    if [[ ${line:0:1} == "#" ]]
+    then
+      continue
+    fi
+
+    kind=$(echo $line | awk '{print$1}')
+    if [[ $kind == "NAME" || $kind == "VERSION" ]]
+    then
+        continue
+    fi
+    if [[ $kind == "GIT" || $kind == "MAINTAINER" || $kind == "WORKDIR"  ]]
+    then
+      value=$(echo $line | awk '{print$2}')
+      key="_"$kind"_"
+      echo $key,$value
+      sed -i s/$key/$value/g `grep $key -rl $name.spec`
+    elif [[ $kind == "DEP" ]]
+    then
+      echo "Hello"
+    else
+      echo "Unsupport"
+    fi
+  done < $1
+
+#/root/rpmbuild/SOURCES/
+#/root/rpmbuild/SPECS/
+}
+
+if [[ $1 == "parse" ]]
+then
+  if [[ -z $2 ]]
+  then
+    parse "RpmFile"
+  else
+    parse $2
+  fi
+fi
