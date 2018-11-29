@@ -44,9 +44,10 @@ function parse()
     fi
     if [[ $kind == "GIT" || $kind == "MAINTAINER" || $kind == "WORKDIR"  ]]
     then
-      value=$(echo $line | awk '{print$2}')
+      str=$(echo $line | awk '{print$2}')
       key="_"$kind"_"
-      echo $key,$value
+      value=${str/"/"/\\/}
+      echo "sed -i 's/$key/$value/g' `grep $key -rl $name.spec`"
       sed -i s/$key/$value/g `grep $key -rl $name.spec`
     elif [[ $kind == "DEP" ]]
     then
