@@ -9,7 +9,6 @@ Source: %{name}-%{version}.tar.gz
 Summary: auto generated
 Packager: _MAINTAINER_
 License: ASL 2.0
-Requires: _DEP_ 
 
 %description
 _NAME_-_VERSION_

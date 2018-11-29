@@ -7,17 +7,17 @@
 ##
 #####################################################
 
-function parse()
+function preCheck()
 {
-  name=$(cat $1 | grep -w "NAME" | grep -v "#NAME" | awk '{print$2}')
-  version=$(cat $1 | grep -w "VERSION" | grep -v "#VERSION" | awk '{print$2}')
-
+  name=$1
+  echo $name
+  version=$2
   if [[ -z $name || -z $version ]]
   then
     echo "Missing Name or Version"
     exit
   fi
- 
+
   if [[ ! -d $name-$version ]]
   then
     echo "Missing diectory "$name-$version, "or you have wrong name with version"
@@ -25,11 +25,40 @@ function parse()
   fi
 
   rm -rf $name.spec
-  cp /root/build.spec $name.spec   
+  cp /root/build.spec $name.spec
+}
 
-  sed -i s/'_NAME_'/$name/g `grep '_NAME_' -rl $name.spec`  
-  sed -i s/'_VERSION_'/$version/g `grep '_VERSION_' -rl $name.spec`  
- 
+function postCheck()
+{
+  name=$1
+  version=$2
+  
+  git=1811
+  mtr=wuheng@iscas.ac.cn
+  dir=\/opt
+  
+  sed -i s/'_NAME_'/$name/g `grep '_NAME_' -rl $name.spec` >/dev/null 2>&1
+  sed -i s/'_VERSION_'/$version/g `grep '_VERSION_' -rl $name.spec` >/dev/null 2>&1 
+  sed -i s/_GIT_/$git/g `grep _GIT_ -rl $name.spec` >/dev/null 2>&1 
+  sed -i s/_MAINTAINER_/$mtr/g `grep _MAINTAINER_ -rl $name.spec` >/dev/null 2>&1
+  sed -i s/_WORKDIR_/$dir/g `grep _WORKDIR_ -rl $name.spec` >/dev/null 2>&1
+
+  mkdir -p /root/rpmbuild/SOURCES/
+  rm -rf $name-$version.tar.gz
+  \cp $3 $name-$version/
+  tar zcvf $name-$version.tar.gz $name-$version/* >/dev/null 2>&1
+  mv -f $name-$version.tar.gz /root/rpmbuild/SOURCES/$name-$version.tar.gz
+  mkdir -p /root/rpmbuild/SPECS/
+  mv -f $name.spec /root/rpmbuild/SPECS/$name.spec
+}
+
+function parse()
+{
+  name=$(cat $1 | grep -w "NAME" | grep -v "#NAME" | awk '{print$2}')
+  version=$(cat $1 | grep -w "VERSION" | grep -v "#VERSION" | awk '{print$2}')
+
+  preCheck $name $version
+
   while read line
   do
     if [[ ${line:0:1} == "#" ]]
@@ -42,37 +71,30 @@ function parse()
     then
         continue
     fi
-    if [[ $kind == "GIT" || $kind == "MAINTAINER" || $kind == "WORKDIR" || $kind == "DEP"  ]]
+    
+    if [[ $kind == "GIT" || $kind == "MAINTAINER" || $kind == "WORKDIR"  ]]
     then
       str=$(echo $line | awk -F"$kind " '{print$2}')
       key="_"$kind"_"
       value=${str/"/"/\\/}
-      echo $key,$value
-      echo "sed -i 's/$key/$value/g' `grep $key -rl $name.spec`"
       sed -i s/$key/$value/g `grep $key -rl $name.spec`
+    elif [[ $kind == "DEP" ]]
+    then
+      for iname in $(echo $line | awk -F"$kind " '{print$2}')
+      do
+        sed -i "10iRequires: $iname" $name.spec
+        echo $iname
+      done
     elif [[ $kind == "CMD" ]]
     then
       cmd=$(echo $line | awk -F"$kind" '{print$2}')
-      echo $cmd
+      #$cmd
     else
       echo continue
     fi
   done < $1
 
-git=1811
-mtr=wuheng@iscas.ac.cn
-dir=\/opt
-sed -i s/_GIT_/$git/g `grep _GIT_ -rl $name.spec`
-sed -i s/_MAINTAINER_/$mtr/g `grep _MAINTAINER_ -rl $name.spec`
-sed -i s/_WORKDIR_/$dir/g `grep _WORKDIR_ -rl $name.spec`
-
-mkdir -p /root/rpmbuild/SOURCES/
-rm -rf $name-$version.tar.gz
-\cp $1 $name-$version/
-tar zcvf $name-$version.tar.gz $name-$version/*
-mv -f $name-$version.tar.gz /root/rpmbuild/SOURCES/$name-$version.tar.gz
-mkdir -p /root/rpmbuild/SPECS/
-mv -f $name.spec /root/rpmbuild/SPECS/$name.spec
+  postCheck $name $version $1
 }
 
 if [[ $1 == "parse" ]]
