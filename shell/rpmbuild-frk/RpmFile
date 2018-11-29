@@ -4,7 +4,7 @@ GIT 1811
 MAINTAINER wuheng@iscas.ac.cn
 #CMD linux standrad script, like copy, mv, and so on 
 #ENV 
-#DEP java-1.8.0-openjdk
+DEP java-1.8.0-openjdk
 #EXPOSE 8080
 WORKDIR /opt
 #START bash ./bin/startup.sh

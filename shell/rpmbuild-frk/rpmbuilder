@@ -1,4 +1,4 @@
-####################################################
+###################################################
 ##
 ## Copyright (2017, ) Institute of Software, CAS
 ##
@@ -42,23 +42,37 @@ function parse()
     then
         continue
     fi
-    if [[ $kind == "GIT" || $kind == "MAINTAINER" || $kind == "WORKDIR"  ]]
+    if [[ $kind == "GIT" || $kind == "MAINTAINER" || $kind == "WORKDIR" || $kind == "DEP"  ]]
     then
-      str=$(echo $line | awk '{print$2}')
+      str=$(echo $line | awk -F"$kind " '{print$2}')
       key="_"$kind"_"
       value=${str/"/"/\\/}
+      echo $key,$value
       echo "sed -i 's/$key/$value/g' `grep $key -rl $name.spec`"
       sed -i s/$key/$value/g `grep $key -rl $name.spec`
-    elif [[ $kind == "DEP" ]]
+    elif [[ $kind == "CMD" ]]
     then
-      echo "Hello"
+      cmd=$(echo $line | awk -F"$kind" '{print$2}')
+      echo $cmd
     else
-      echo "Unsupport"
+      echo continue
     fi
   done < $1
 
-#/root/rpmbuild/SOURCES/
-#/root/rpmbuild/SPECS/
+git=1811
+mtr=wuheng@iscas.ac.cn
+dir=\/opt
+sed -i s/_GIT_/$git/g `grep _GIT_ -rl $name.spec`
+sed -i s/_MAINTAINER_/$mtr/g `grep _MAINTAINER_ -rl $name.spec`
+sed -i s/_WORKDIR_/$dir/g `grep _WORKDIR_ -rl $name.spec`
+
+mkdir -p /root/rpmbuild/SOURCES/
+rm -rf $name-$version.tar.gz
+\cp $1 $name-$version/
+tar zcvf $name-$version.tar.gz $name-$version/*
+mv -f $name-$version.tar.gz /root/rpmbuild/SOURCES/$name-$version.tar.gz
+mkdir -p /root/rpmbuild/SPECS/
+mv -f $name.spec /root/rpmbuild/SPECS/$name.spec
 }
 
 if [[ $1 == "parse" ]]

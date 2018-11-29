@@ -6,6 +6,7 @@ Name: _NAME_
 Version: _VERSION_
 Release: qcase._GIT_%{?dist}
 Source: %{name}-%{version}.tar.gz
+Summary: auto generated
 Packager: _MAINTAINER_
 License: ASL 2.0
 Requires: _DEP_ 
@@ -14,11 +15,11 @@ Requires: _DEP_
 _NAME_-_VERSION_
 
 %prep
-%setup -n %{name}
+%setup -n %{name}-%{version}
 
 %install
 mkdir -p %{buildroot}_WORKDIR_
-cp -r /root/rpmbuild/BUILD/%{name}* %{buildroot}_WORKDIR_
+cp -r /root/rpmbuild/BUILD/%{name}-%{version} %{buildroot}_WORKDIR_
 
 %files
 _WORKDIR_
