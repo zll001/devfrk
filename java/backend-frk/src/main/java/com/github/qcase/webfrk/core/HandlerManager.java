@@ -19,6 +19,11 @@ public class HandlerManager  {
 
 	protected Map<String, HandlerDesc> handlers = new HashMap<String, HandlerDesc>();
 
+	
+	public HandlerManager() {
+		super();
+	}
+
 	public void addHandler(String kind, HandlerDesc hp) {
 		handlers.put(kind, hp);
 	}

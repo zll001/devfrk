@@ -3,23 +3,28 @@
  */
 package com.github.qcase.webfrk.core.spi;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
-import com.github.qcase.webfrk.core.HttpController;
 import com.github.qcase.webfrk.core.HandlerManager;
 import com.github.qcase.webfrk.core.HandlerManager.HandlerDesc;
 import com.github.qcase.webfrk.core.HttpConstants;
+import com.github.qcase.webfrk.core.HttpController;
+import com.github.qcase.webfrk.core.HttpFrkUtils;
 
 /**
  * @author wuheng(@iscas.ac.cn)
  * @since   2018/11/24
  */
-public abstract class HttpBodyHandler implements CommandLineRunner {
+public abstract class HttpBodyHandler implements CommandLineRunner, ApplicationContextAware {
 
 	public final static String POSTFIX = "Service";
 	
@@ -33,6 +38,8 @@ public abstract class HttpBodyHandler implements CommandLineRunner {
 	 */
 	@Autowired
 	protected HandlerManager configure;
+	
+	protected static ApplicationContext ctx;
 	
 	/**
 	 * 
@@ -51,13 +58,35 @@ public abstract class HttpBodyHandler implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		
 		String classname = getClass().getSimpleName();
-		if (!classname.endsWith(POSTFIX) || classname.indexOf("/") != -1) {
+		if (classname.endsWith(POSTFIX) || classname.indexOf("/") != -1) {
+			registerService(classname);
+//			autowiredField(classname);
+		} else {
 			m_logger.error(HttpConstants.EXCEPTION_INVALID_SERVICE_ANOTATION);
-			return;
 		}
-		
+	}
+
+	private void autowiredField(String classname) throws IllegalAccessException {
+		for (Field field : getClass().getDeclaredFields()) {
+			if (field.getAnnotation(Autowired.class) != null) {
+				field.setAccessible(true);
+				field.set(ctx.getBean(HttpFrkUtils.getName(
+						classname)), ctx.getBean(field.getName()));
+			}
+		}
+	}
+
+	
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		if (ctx == null) {
+			ctx = applicationContext;
+		}
+	}
+
+	private void registerService(String classname) {
 		String name = classname.substring(0, classname.length() - POSTFIX.length());
-		String serv = name.substring(0, 1).toLowerCase() + name.substring(1);
+		String serv = HttpFrkUtils.getName(name);
 		
 		for (Method method : getClass().getMethods()) {
 			if (Modifier.isPublic(method.getModifiers())
@@ -67,4 +96,5 @@ public abstract class HttpBodyHandler implements CommandLineRunner {
 			}
 		}
 	}
+
 }

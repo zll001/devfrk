@@ -9,7 +9,10 @@ import java.lang.reflect.Method;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,8 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.qcase.webfrk.core.spi.BeanDefinition;
-import com.github.qcase.webfrk.core.spi.HttpBodyHandler;
-import com.github.qcase.webfrk.utils.JSONUtils;
 
 /**
  * @author wuheng(@iscas.ac.cn)
@@ -34,7 +35,7 @@ import com.github.qcase.webfrk.utils.JSONUtils;
  */
 @RestController
 @ComponentScan
-public class HttpController {
+public class HttpController implements ApplicationContextAware {
 
 	/**
 	 * logger 
@@ -47,6 +48,8 @@ public class HttpController {
 	 */
 	@Autowired
 	protected HandlerManager handlers;
+	
+	protected static ApplicationContext ctx;
 	
 	/**
 	 * @param request    servlet path should be startwith 'get', 'list', or 'query'
@@ -73,7 +76,9 @@ public class HttpController {
 				HttpServletRequest request, @RequestBody JSONObject body) throws Exception{
 		// in fact, it can be checked by regular expression at @RequestMapping,
 		// and we would improve it later
-		String spath = getServletPath(request);
+		String path = getServletPath(request);
+		int length  = path.indexOf("/");
+		String spath = path.substring(length + 1);
 		if (spath.startsWith("get") || spath.startsWith("list") 
 										|| spath.startsWith("query") 
 										|| spath.startsWith("delete")
@@ -107,14 +112,22 @@ public class HttpController {
 		
 		try {
 			Method target = handlers.geHandler(servletPath).getMethod();
-			Object returnObject = target.invoke(
-						getInstance(servletPath), 
-						getParams(body, target));
+			Object[] params = getParams(body, target);
+			Object returnObject = null;
+			if (params != null) {
+				returnObject = target.invoke(
+							getInstance(servletPath), 
+							params);
+			} else {
+				returnObject = target.invoke(
+						getInstance(servletPath));
+			}
 			m_logger.info("Successfully deal with " + servletPath);
 			HttpResponse resp = new HttpResponse(HttpConstants
 					.HTTP_RESPONSE_STATUS_OK, returnObject);
 			return JSON.toJSONString(resp);
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			throw new Exception(HttpConstants.EXCEPTION_INVALID_BEANDEFINITION_ANOTATION);
 		}
 		
@@ -125,7 +138,7 @@ public class HttpController {
 	public String handleInvalidHttpRequestURL(HttpServletRequest request) {
 		m_logger.error("Fail to deal with " + request.getServletPath() 
 						+ " the reason is: " + HttpConstants.EXCEPTION_INVALID_REQUEST_URL);
-		return JSONUtils.toJSONString(
+		return HttpFrkUtils.toJSONString(
         		new HttpResponse(HttpConstants.HTTP_RESPONSE_STATUS_FAILED
         				, HttpConstants.EXCEPTION_INVALID_REQUEST_URL));
 	}
@@ -135,7 +148,7 @@ public class HttpController {
 	public String handleInvalidHttpRequestException(HttpServletRequest request, Exception e) {
 		m_logger.error("Fail to deal with " + request.getServletPath() 
 									+ ", the reason is: " + String.valueOf(e.getMessage()));
-        return JSONUtils.toJSONString(
+        return HttpFrkUtils.toJSONString(
         		new HttpResponse(HttpConstants.HTTP_RESPONSE_STATUS_FAILED, String.valueOf(e.getMessage())));
 	}
 	
@@ -151,9 +164,10 @@ public class HttpController {
 				request.getContextPath().length() + 1);
 	}
 	
-	protected HttpBodyHandler getInstance(String servletPath) throws Exception {
-		return (HttpBodyHandler) handlers.geHandler(
-							servletPath).getClazz().newInstance();
+	protected Object getInstance(String servletPath) throws Exception {
+		String name = HttpFrkUtils.getName(handlers.geHandler(
+							servletPath).getClazz().getSimpleName());
+		return ctx.getBean(name);
 	}
 	
 	protected Object[] getParams(JSONObject body, Method targetMethod) {
@@ -170,6 +184,13 @@ public class HttpController {
 			pObjects[i] = body.getObject(pNames[i], pTypes[i]);
 		}
 		return pObjects;
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		if (ctx == null) {
+			ctx = applicationContext;
+		}
 	}
 
 }

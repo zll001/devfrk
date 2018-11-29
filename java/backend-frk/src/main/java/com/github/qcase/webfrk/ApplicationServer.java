@@ -3,6 +3,7 @@
  */
 package com.github.qcase.webfrk;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -20,6 +21,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Note: do not modify this class
  */ 
 @SpringBootApplication
+@MapperScan(value = "com.bocloud.paas.auth")
 public class ApplicationServer {
 
 	public static void main(String[] args) {
