@@ -1,4 +1,4 @@
-package com.bocloud.paas.auth;
+package com.bocloud.paas.auth.handler;
 
 import java.util.List;
 

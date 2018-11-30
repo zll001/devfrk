@@ -1,7 +1,20 @@
 server:
   port: 9090
   servlet:
-    context-path: /application/v2.0
+    context-path: /application/2.0
 logging:
   config: classpath:log4j.properties
    
+#数据库连接 
+spring:
+    datasource:
+        name: database
+        url: jdbc:mysql://127.0.0.1:3306/test
+        username: root
+        password: onceas
+        driver-class-name: com.mysql.jdbc.Driver
+        # 使用druid数据源
+        type: com.alibaba.druid.pool.DruidDataSource
+mybatis:
+  mapper-locations: classpath*:mapping/*.xml
+  type-aliases-package: com.bocloud.paas.auth.entity

@@ -1,7 +1,7 @@
 /**
  * Copyright (2018, ) Institute of Software, Chinese Academy of Sciences
  */
-package com.github.qcase.webfrk.core.demo;
+package com.bocloud.paas.auth.handler;
 
 import java.util.Map;
 

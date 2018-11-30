@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bocloud.paas.auth.repository.UserMapper">
+	<resultMap id="BaseResultMap" type="com.bocloud.paas.auth.entity.User">
+		<id column="user_ID" property="userId" jdbcType="INTEGER" />
+		<result column="USER_NAME" property="userName" jdbcType="VARCHAR" />
+		<result column="USER_PASS" property="userPass" jdbcType="VARCHAR" />
+		<result column="USER_MAIL" property="userMail" jdbcType="VARCHAR" />
+		<result column="USER_PHONE" property="userPhone" jdbcType="VARCHAR" />
+		<result column="USER_DEPT" property="userDept" jdbcType="VARCHAR" />
+		<result column="USER_REALNAME" property="userRealName" jdbcType="VARCHAR" />
+		<result column="USER_COMPANY" property="userCompany" jdbcType="VARCHAR" />
+		<result column="USER_STATUS" property="userStatus" jdbcType="TINYINT" />
+		<result column="USER_CREATEDATE" property="userCreatedate" jdbcType="TIMESTAMP" />
+		<result column="LAST_TIME" property="lastTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		USER_ID,USER_NAME, USER_PASS, USER_MAIL, USER_PHONE,
+		USER_COMPANY,USER_STATUS,USER_CREATEDATE,LAST_TIME,USER_DEPT,USER_REALNAME
+	</sql>
+	
+	<select id="getUser" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from user
+		where user_ID=#{userId,jdbcType=INTEGER}
+	</select>
+	
+	
+	<!-- Select all user -->
+	<select id="getUsers" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from user
+		where 
+			USER_STATUS = 1
+		order by user_NAME ASC
+	</select>
+	
+	<!-- delete user by userId -->
+	<delete id="deleteUserById" parameterType="java.lang.Integer">
+		delete from user where user_ID = #{userId,jdbcType=INTEGER}
+	</delete>
+	
+	<!-- Insert user -->
+	<insert id="insert" parameterType="com.bocloud.paas.auth.entity.User"
+		useGeneratedKeys="true" keyProperty="userId">
+		insert into user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="userName != null and userName != ''">
+				USER_NAME,
+			</if>
+			<if test="userPass != null and userPass != ''">
+				USER_PASS,
+			</if>
+			<if test="userMail != null and userMail != ''">
+				USER_MAIL,
+			</if>
+			<if test="userPhone != null and userPhone != ''">
+				USER_PHONE,
+			</if>
+			<if test="userCompany != null and userCompany != ''">
+				USER_COMPANY,
+			</if>
+			<if test="userStatus != null ">
+				USER_STATUS,
+			</if>
+			<if test="userCreatedate != null ">
+				USER_CREATEDATE,
+			</if>
+			<if test="userCreator != null ">
+				USER_CREATOR,
+			</if>
+			<if test="userDept != null ">
+				USER_DEPT,
+			</if>
+			<if test="userRealName != null ">
+				USER_REALNAME,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="userName != null and userName != ''">
+				#{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="userPass != null and userPass != ''">
+				#{userPass,jdbcType=VARCHAR},
+			</if>
+			<if test="userMail != null and userMail != ''">
+				#{userMail,jdbcType=VARCHAR},
+			</if>
+			<if test="userPhone != null and userPhone != ''">
+				#{userPhone,jdbcType=VARCHAR},
+			</if>
+			<if test="userCompany != null and userCompany != ''">
+				#{userCompany,jdbcType=VARCHAR},
+			</if>
+			<if test="userStatus != null ">
+				#{userStatus,jdbcType=TINYINT},
+			</if>
+			<if test="userCreatedate != null ">
+				#{userCreatedate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="userDept != null ">
+				#{userDept,jdbcType=VARCHAR},
+			</if>
+			<if test="userRealName != null ">
+				#{userRealName,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+</mapper>

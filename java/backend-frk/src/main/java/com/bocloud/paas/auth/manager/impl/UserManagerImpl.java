@@ -2,17 +2,16 @@ package com.bocloud.paas.auth.manager.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.bocloud.paas.auth.entity.User;
 import com.bocloud.paas.auth.manager.UserManager;
 import com.bocloud.paas.auth.repository.UserMapper;
+import com.github.qcase.webfrk.core.spi.ServiceDefinition;
 
 /**
  * 用户服务实现类
  * 
  */
-@Service("userManager")
+@ServiceDefinition
 public class UserManagerImpl implements UserManager {
 	
 	@Autowired
