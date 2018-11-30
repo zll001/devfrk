@@ -16,6 +16,7 @@ public class UserService extends HttpBodyHandler {
 	@Autowired
 	private UserManager userManager;
 	
+//	@Log(module = BoCloudService.Bmp, target = "登录", operation = "登录页面初始化")
 	@BeanDefinition
 	public List<User> list() {
 		List<User> users=null;
